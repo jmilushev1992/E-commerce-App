@@ -1,0 +1,63 @@
+/* eslint-disable linebreak-style */
+module.exports = {
+  parser: '@babel/eslint-parser',
+  parserOptions: {
+    requireConfigFile: false,
+    babelOptions: {
+      parserOpts: {
+        plugins: ['jsx'],
+      },
+    },
+  },
+  extends: ['airbnb'],
+  env: {
+    browser: true,
+    jest: true,
+  },
+  plugins: ['react', 'jsx-a11y', 'import'],
+  rules: {
+    camelcase: 'off',
+    'no-underscore-dangle': ['error', { allow: ['_id'] }],
+    'no-mixed-operators': 'off',
+    'prefer-arrow-callback': 'error',
+    'prefer-destructuring': [
+      'error',
+      {
+        VariableDeclarator: {
+          array: false,
+          object: true,
+        },
+        AssignmentExpression: {
+          array: true,
+          object: false,
+        },
+      },
+      {
+        enforceForRenamedProperties: false,
+      },
+    ],
+    'import/prefer-default-export': 'off',
+    'jsx-a11y/anchor-is-valid': 'off',
+    'react/jsx-wrap-multilines': 'off',
+    'react/destructuring-assignment': 'off',
+    'react/no-danger': 'off',
+    'react/jsx-one-expression-per-line': 'off',
+    'react/jsx-props-no-spreading': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'react/jsx-filename-extension': [
+      'error',
+      {
+        extensions: ['.jsx'],
+      },
+    ],
+    'no-console': 'off',
+    'class-methods-use-this': 'off',
+    'react/function-component-definition': [
+      2,
+      {
+        namedComponents: 'arrow-function',
+        unnamedComponents: 'arrow-function',
+      },
+    ],
+  },
+};
