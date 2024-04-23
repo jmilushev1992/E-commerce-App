@@ -6,6 +6,7 @@ const Chapter = require('../models/Chapter');
 
 const router = express.Router();
 
+// Route to get a list of books
 router.get('/books', async (req, res) => {
   try {
     const books = await Book.list();
@@ -15,6 +16,7 @@ router.get('/books', async (req, res) => {
   }
 });
 
+// Route to get details of a specific book by its slug
 router.get('/books/:slug', async (req, res) => {
   try {
     const book = await Book.getBySlug({ slug: req.params.slug });
@@ -24,6 +26,7 @@ router.get('/books/:slug', async (req, res) => {
   }
 });
 
+// Route to get details of a specific chapter by bookSlug and chapterSlug
 router.get('/get-chapter-detail', async (req, res) => {
   try {
     const { bookSlug, chapterSlug } = req.query;
