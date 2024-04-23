@@ -12,10 +12,18 @@ import { getBookDetailApiMethod, syncBookContentApiMethod } from '../../lib/api/
 import withAuth from '../../lib/withAuth';
 import notify from '../../lib/notify';
 
+/**
+ * Prop types for BookDetail component.
+ */
 const propTypes = {
   slug: PropTypes.string.isRequired,
 };
 
+/**
+ * Component for displaying book details.
+ * @param {Object} props - Component props.
+ * @returns {JSX.Element} - BookDetail component.
+ */
 const BookDetail = ({ slug }) => {
   const [book, setBook] = useState(null);
   const [error, setError] = useState(null);
@@ -37,6 +45,9 @@ const BookDetail = ({ slug }) => {
     getBookDetail();
   }, []);
 
+  /**
+   * Function to handle syncing book content with Github.
+   */
   const handleSyncContent = async () => {
     const bookId = book._id;
 
@@ -95,10 +106,16 @@ const BookDetail = ({ slug }) => {
   );
 };
 
+/**
+ * Fetches initial props for BookDetail component.
+ * @param {Object} context - Context object.
+ * @returns {Object} - Initial props.
+ */
 BookDetail.getInitialProps = async ({ query }) => {
   return { slug: query.slug };
 };
 
 BookDetail.propTypes = propTypes;
 
+// Wrap BookDetail component with authentication requirement (admin)
 export default withAuth(BookDetail, { adminRequired: true });
