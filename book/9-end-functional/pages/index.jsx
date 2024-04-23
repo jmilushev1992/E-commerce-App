@@ -18,7 +18,7 @@ const defaultProps = {
   user: null,
 };
 
-// eslint-disable-next-line react/prefer-stateless-function
+// Component for displaying user settings
 class Index extends React.Component {
   render() {
     const { user } = this.props;
@@ -38,4 +38,4 @@ class Index extends React.Component {
 Index.propTypes = propTypes;
 Index.defaultProps = defaultProps;
 
-export default withAuth(Index);
+export default withAuth(Index); // Wrap component with authentication HOC
