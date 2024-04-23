@@ -9,31 +9,35 @@ const logger = require('../logger');
 
 const router = express.Router();
 
+// Middleware to check if user is authenticated
 router.use((req, res, next) => {
   if (!req.user) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-
   next();
 });
 
+// Endpoint to fetch checkout session from Stripe
 router.post('/stripe/fetch-checkout-session', async (req, res) => {
   try {
     const { bookId, redirectUrl } = req.body;
 
+    // Find the book by ID
     const book = await Book.findById(bookId).select(['slug']).setOptions({ lean: true });
 
     if (!book) {
       throw new Error('Book not found');
     }
 
+    // Check if the user has already purchased the book
     const isPurchased =
       (await Purchase.find({ userId: req.user._id, bookId: book._id }).countDocuments()) > 0;
     if (isPurchased) {
       throw new Error('You already bought this book.');
     }
 
+    // Create a checkout session with Stripe
     const session = await createSession({
       userId: req.user._id.toString(),
       userEmail: req.user.email,
@@ -42,23 +46,4 @@ router.post('/stripe/fetch-checkout-session', async (req, res) => {
       redirectUrl,
     });
 
-    res.json({ sessionId: session.id });
-  } catch (err) {
-    logger.error(err);
-    res.json({ error: err.message || err.toString() });
-  }
-});
-
-router.get('/my-books', async (req, res) => {
-  try {
-    const { purchasedBookIds = [] } = req.user;
-
-    const purchasedBooks = await Book.getPurchasedBooks({ purchasedBookIds });
-
-    res.json({ purchasedBooks });
-  } catch (err) {
-    res.json({ error: err.message || err.toString() });
-  }
-});
-
-module.exports = router;
+    res.json({ sessionId: session.id
