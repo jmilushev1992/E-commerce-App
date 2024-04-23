@@ -1,19 +1,19 @@
 /* eslint-disable no-multiple-empty-lines */
 /* eslint-disable linebreak-style */
 
-
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import NProgress from 'nprogress';
-
 import Button from '@mui/material/Button';
 
 import notify from '../../lib/notify';
-
 import withAuth from '../../lib/withAuth';
 import { getBookListApiMethod } from '../../lib/api/admin';
 
+/**
+ * PropTypes for the Index component.
+ */
 const propTypes = {
   books: PropTypes.arrayOf(
     PropTypes.shape({
@@ -23,6 +23,11 @@ const propTypes = {
   ).isRequired,
 };
 
+/**
+ * Component for displaying a list of books.
+ * @param {Object} props - Component props.
+ * @returns {JSX.Element} - Index component.
+ */
 const Index = ({ books }) => {
   return (
     <div style={{ padding: '10px 45px' }}>
@@ -56,6 +61,9 @@ const Index = ({ books }) => {
 
 Index.propTypes = propTypes;
 
+/**
+ * PropTypes for the IndexWithData component.
+ */
 const propTypes2 = {
   errorMessage: PropTypes.string,
 };
@@ -64,6 +72,11 @@ const defaultProps2 = {
   errorMessage: null,
 };
 
+/**
+ * Component for fetching book data and passing it to the Index component.
+ * @param {Object} props - Component props.
+ * @returns {JSX.Element} - IndexWithData component.
+ */
 const IndexWithData = ({ errorMessage }) => {
   const [books, setBooks] = useState([]);
 
@@ -77,7 +90,6 @@ const IndexWithData = ({ errorMessage }) => {
 
       try {
         const booksFromServer = await getBookListApiMethod();
-        // console.log('client', booksFromServer);
         setBooks(booksFromServer);
       } catch (err) {
         notify(err);
@@ -95,4 +107,5 @@ const IndexWithData = ({ errorMessage }) => {
 IndexWithData.propTypes = propTypes2;
 IndexWithData.defaultProps = defaultProps2;
 
+// Wrap IndexWithData component with authentication requirement (admin)
 export default withAuth(IndexWithData, { adminRequired: true });
