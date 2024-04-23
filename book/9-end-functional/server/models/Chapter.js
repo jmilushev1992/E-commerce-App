@@ -1,30 +1,36 @@
 /* eslint-disable linebreak-style */
+// Disables eslint rule for line break style
 
 /* eslint-disable no-use-before-define */
+// Disables eslint rule for using variables before they are defined
 
 const mongoose = require('mongoose');
 const { marked } = require('marked');
 const he = require('he');
 const hljs = require('highlight.js');
-// const Book = require('./Book');
+// const Book = require('./Book'); // Import Book model (currently commented out)
 const generateSlug = require('../utils/slugify');
 const Purchase = require('./Purchase');
 
+// Function to convert markdown content to HTML
 function markdownToHtml(content) {
   const renderer = new marked.Renderer();
 
+  // Customizing behavior for links
   renderer.link = (href, title, text) => {
     const t = title ? ` title="${title}"` : '';
     return `<a target="_blank" href="${href}" rel="noopener noreferrer"${t}>${text}</a>`;
   };
 
+  // Customizing behavior for images
   renderer.image = (href) => `<img
     src="${href}"
     style="border: 1px solid #ddd;"
     width="100%"
-    alt="Builder Book"
+    alt="Book Store"
   >`;
 
+  // Customizing behavior for headings
   renderer.heading = (text, level) => {
     const escapedText = text
       .trim()
@@ -60,6 +66,7 @@ function markdownToHtml(content) {
     return `<h${level} style="color: #222; font-weight: 400;">${text}</h${level}>`;
   };
 
+  // Setting options for marked
   marked.setOptions({
     renderer,
     breaks: true,
@@ -67,14 +74,15 @@ function markdownToHtml(content) {
       if (!lang) {
         return hljs.highlightAuto(code).value;
       }
-
       return hljs.highlight(lang, code).value;
     },
   });
 
+  // Converting markdown content to HTML and returning
   return marked(he.decode(content));
 }
 
+// Function to extract sections from markdown content
 function getSections(content) {
   const renderer = new marked.Renderer();
 
@@ -101,6 +109,7 @@ function getSections(content) {
   return sections;
 }
 
+// MongoDB Schema definition
 const { Schema } = mongoose;
 
 const mongoSchema = new Schema({
@@ -161,7 +170,9 @@ const mongoSchema = new Schema({
   ],
 });
 
+// Class definition for Chapter model
 class ChapterClass {
+  // Method to get chapter by its slug
   static async getBySlug({ bookSlug, chapterSlug, userId, isAdmin }) {
     const book = await Book.getBySlug({ slug: bookSlug });
     if (!book) {
@@ -192,6 +203,7 @@ class ChapterClass {
     return chapterObj;
   }
 
+  // Method to sync content of a chapter
   static async syncContent({ book, data }) {
     const {
       title,
@@ -265,13 +277,16 @@ class ChapterClass {
   }
 }
 
+// Indexes for MongoDB Schema
 mongoSchema.index({ bookId: 1, slug: 1 }, { unique: true });
 mongoSchema.index({ bookId: 1, githubFilePath: 1 }, { unique: true });
 
+// Load class methods into Schema
 mongoSchema.loadClass(ChapterClass);
 
+// Create Chapter model
 const Chapter = mongoose.model('Chapter', mongoSchema);
 
 module.exports = Chapter;
 
-const Book = require('./Book');
+// const Book = require('./Book'); // Import Book model (currently commented out)
