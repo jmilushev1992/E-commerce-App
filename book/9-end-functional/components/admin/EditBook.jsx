@@ -13,6 +13,7 @@ import { getGithubReposApiMethod } from '../../lib/api/admin';
 import { styleTextField } from '../SharedStyles';
 import notify from '../../lib/notify';
 
+// Prop types definition
 const propTypes = {
   book: PropTypes.shape({
     _id: PropTypes.string.isRequired,
@@ -20,6 +21,7 @@ const propTypes = {
   onSave: PropTypes.func.isRequired,
 };
 
+// Default props
 const defaultProps = {
   book: null,
 };
@@ -28,6 +30,7 @@ class EditBook extends React.Component {
   constructor(props) {
     super(props);
 
+    // Initial state
     this.state = {
       book: props.book || {},
       repos: [],
@@ -36,17 +39,20 @@ class EditBook extends React.Component {
 
   async componentDidMount() {
     try {
+      // Fetch GitHub repos
       const { repos } = await getGithubReposApiMethod();
-      this.setState({ repos }); // eslint-disable-line
+      this.setState({ repos });
     } catch (err) {
-      console.log(err); // eslint-disable-line
+      console.log(err); // Log error if fetch fails
     }
   }
 
+  // Form submission handler
   onSubmit = (event) => {
     event.preventDefault();
     const { name, price, githubRepo } = this.state.book;
 
+    // Validation checks
     if (!name) {
       notify('Name is required');
       return;
@@ -62,6 +68,7 @@ class EditBook extends React.Component {
       return;
     }
 
+    // Save book
     this.props.onSave(this.state.book);
   };
 
@@ -74,7 +81,6 @@ class EditBook extends React.Component {
             <TextField
               onChange={(event) => {
                 this.setState({
-                  // eslint-disable-next-line
                   book: { ...this.state.book, name: event.target.value },
                 });
               }}
@@ -89,7 +95,6 @@ class EditBook extends React.Component {
           <TextField
             onChange={(event) => {
               this.setState({
-                // eslint-disable-next-line
                 book: { ...this.state.book, price: Number(event.target.value) },
               });
             }}
@@ -110,7 +115,6 @@ class EditBook extends React.Component {
               onChange={(event) => {
                 event.stopPropagation();
                 this.setState({
-                  // eslint-disable-next-line
                   book: { ...this.state.book, githubRepo: event.target.value },
                 });
               }}
