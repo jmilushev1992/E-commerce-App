@@ -11,6 +11,7 @@ import Avatar from '@mui/material/Avatar';
 
 import MenuWithAvatar from './MenuWithAvatar';
 
+// Options for the customer menu
 const optionsMenuCustomer = [
   {
     text: 'My books',
@@ -24,6 +25,7 @@ const optionsMenuCustomer = [
   },
 ];
 
+// Options for the admin menu
 const optionsMenuAdmin = [
   {
     text: 'Admin',
@@ -37,6 +39,7 @@ const optionsMenuAdmin = [
   },
 ];
 
+// Prop types definition
 const propTypes = {
   user: PropTypes.shape({
     avatarUrl: PropTypes.string,
@@ -48,12 +51,14 @@ const propTypes = {
   redirectUrl: PropTypes.string,
 };
 
+// Default props
 const defaultProps = {
   user: null,
   hideHeader: false,
   redirectUrl: '',
 };
 
+// Header component
 const Header = ({ user, hideHeader, redirectUrl }) => {
   return (
     <div
@@ -92,7 +97,7 @@ const Header = ({ user, hideHeader, redirectUrl }) => {
           </Grid>
           <Grid item sm={2} xs={3} style={{ textAlign: 'right' }}>
             {user ? (
-              <div style={{ whiteSpace: ' nowrap' }}>
+              <div style={{ whiteSpace: 'nowrap' }}>
                 {!user.isAdmin ? (
                   <MenuWithAvatar
                     options={optionsMenuCustomer}
