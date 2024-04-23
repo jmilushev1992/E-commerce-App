@@ -8,12 +8,14 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Avatar from '@mui/material/Avatar';
 
+// Define prop types
 const propTypes = {
   src: PropTypes.string.isRequired,
   alt: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(Object).isRequired,
 };
 
+// Class component for rendering a menu with an avatar
 class MenuWithAvatar extends React.Component {
   constructor() {
     super();
@@ -23,10 +25,12 @@ class MenuWithAvatar extends React.Component {
     };
   }
 
+  // Handle click event to open the menu
   handleClick = (event) => {
     this.setState({ anchorEl: event.currentTarget });
   };
 
+  // Handle close event to close the menu
   handleClose = () => {
     this.setState({ anchorEl: null });
   };
