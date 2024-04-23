@@ -1,22 +1,28 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable no-multiple-empty-lines */
 
-
 import React, { useState, useEffect } from 'react';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import PropTypes from 'prop-types';
-// import Error from 'next/error';
 
 import EditBook from '../../components/admin/EditBook';
 import { getBookDetailApiMethod, editBookApiMethod } from '../../lib/api/admin';
 import withAuth from '../../lib/withAuth';
 import notify from '../../lib/notify';
 
+/**
+ * Prop types for EditBookPage component.
+ */
 const propTypes = {
   slug: PropTypes.string.isRequired,
 };
 
+/**
+ * Component for editing book details.
+ * @param {Object} props - Component props.
+ * @returns {JSX.Element} - EditBookPage component.
+ */
 const EditBookPage = ({ slug }) => {
   const [book, setBook] = useState(null);
 
@@ -37,6 +43,10 @@ const EditBookPage = ({ slug }) => {
     getBook();
   }, []);
 
+  /**
+   * Function to handle saving edited book data.
+   * @param {Object} data - Edited book data.
+   */
   const editBookOnSave = async (data) => {
     NProgress.start();
 
@@ -56,7 +66,6 @@ const EditBookPage = ({ slug }) => {
   };
 
   if (!book) {
-    // return <Error statusCode={500} />;
     return null;
   }
 
@@ -67,10 +76,16 @@ const EditBookPage = ({ slug }) => {
   );
 };
 
+/**
+ * Fetches initial props for EditBookPage component.
+ * @param {Object} context - Context object.
+ * @returns {Object} - Initial props.
+ */
 EditBookPage.getInitialProps = async ({ query }) => {
   return { slug: query.slug };
 };
 
 EditBookPage.propTypes = propTypes;
 
+// Wrap EditBookPage component with authentication requirement (admin)
 export default withAuth(EditBookPage, { adminRequired: true });
