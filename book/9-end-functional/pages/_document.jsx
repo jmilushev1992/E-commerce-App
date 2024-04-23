@@ -9,25 +9,36 @@ import PropTypes from 'prop-types';
 import createEmotionServer from '@emotion/server/create-instance';
 import createCache from '@emotion/cache';
 
+// PropTypes for MyDocument component
 const propTypes = {
   styles: PropTypes.arrayOf(
-    PropTypes.string || PropTypes.number || PropTypes.ReactElementLike || React.ReactFragment,
+    PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+      PropTypes.element,
+      PropTypes.object,
+    ]),
   ).isRequired,
 };
 
+// Custom document component to modify the initial HTML document served from the Next.js server
 const MyDocument = ({ styles }) => {
   return (
     <Html lang="en" style={{ height: '100%' }}>
       <Head>
+        {/* Meta tags */}
         <meta charSet="utf-8" />
         <meta name="google" content="notranslate" />
         <meta name="theme-color" content="#1976D2" />
-
+        
+        {/* Favicon */}
         <link rel="shortcut icon" href="https://storage.googleapis.com/builderbook/favicon32.png" />
 
+        {/* External stylesheets */}
         <link rel="stylesheet" href="/fonts/server.css" />
         <link rel="stylesheet" href="https://storage.googleapis.com/builderbook/vs.min.css" />
 
+        {/* Inline styles */}
         <style>
           {`
               a {
@@ -56,6 +67,8 @@ const MyDocument = ({ styles }) => {
               }
             `}
         </style>
+
+        {/* Google Analytics script */}
         <script
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
@@ -72,6 +85,7 @@ const MyDocument = ({ styles }) => {
             `,
           }}
         />
+
         {/* Inject styles first to match with the prepend: true configuration. */}
         {styles}
       </Head>
@@ -83,24 +97,18 @@ const MyDocument = ({ styles }) => {
   );
 };
 
+// Get initial props for server-side rendering
 MyDocument.getInitialProps = async (ctx) => {
-  // Render app and page and get the context of the page with collected side effects.
   const originalRenderPage = ctx.renderPage;
-
-  // You can consider sharing the same emotion cache between all the SSR requests to speed up performance.
-  // However, be aware that it can have global side effects.
   const cache = createCache({ key: 'css' });
   const { extractCriticalToChunks } = createEmotionServer(cache);
 
   ctx.renderPage = () =>
     originalRenderPage({
-      // eslint-disable-next-line react/display-name
       enhanceApp: (App) => (props) => <App emotionCache={cache} {...props} />,
     });
 
   const initialProps = await Document.getInitialProps(ctx);
-  // This is important. It prevents emotion to render invalid HTML.
-  // See https://github.com/mui-org/material-ui/issues/26561#issuecomment-855286153
   const chunks = extractCriticalToChunks(initialProps.html);
 
   const emotionStyleTags = chunks.styles.map((style) => (
@@ -113,7 +121,6 @@ MyDocument.getInitialProps = async (ctx) => {
 
   return {
     ...initialProps,
-    // Styles fragment is rendered after the app and page rendering finish.
     styles: [...React.Children.toArray(initialProps.styles), ...emotionStyleTags],
   };
 };
