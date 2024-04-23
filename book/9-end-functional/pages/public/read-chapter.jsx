@@ -1,22 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-
 import PropTypes from 'prop-types';
 import Error from 'next/error';
 import Head from 'next/head';
 import { withRouter } from 'next/router';
 import throttle from 'lodash/throttle';
-
 import Link from 'next/link';
-
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-
 import Header from '../../components/Header';
 import BuyButton from '../../components/customer/BuyButton';
-
 import { getChapterDetailApiMethod } from '../../lib/api/public';
 import withAuth from '../../lib/withAuth';
 import notify from '../../lib/notify';
 
+// Style for icon
 const styleIcon = {
   opacity: '0.75',
   fontSize: '24px',
@@ -31,6 +27,7 @@ const ReadChapterFunctional = ({
   checkoutCanceled,
   error,
 }) => {
+  // State variables
   const [showTOC, setShowTOC] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -40,6 +37,7 @@ const ReadChapterFunctional = ({
   );
   const [activeSection, setActiveSection] = useState(null);
 
+  // Function to get previous value of a variable
   function usePrevious(value) {
     const ref = useRef();
     useEffect(() => {
@@ -53,6 +51,7 @@ const ReadChapterFunctional = ({
 
   const mounted = useRef();
 
+  // Function to handle scrolling to active section
   const onScrollActiveSection = () => {
     const sectionElms = document.querySelectorAll('span.section-anchor');
     let activeSectionCurrent;
@@ -92,12 +91,14 @@ const ReadChapterFunctional = ({
     }
   };
 
+  // Function to handle hiding header on scroll
   const onScrollHideHeader = () => {
     const distanceFromTop = document.getElementById('main-content').scrollTop;
     const hideHeaderCurrent = distanceFromTop > 500;
     setHideHeader(hideHeaderCurrent);
   };
 
+  // Throttled scroll event listener
   const onScroll = throttle(() => {
     onScrollActiveSection();
     onScrollHideHeader();
@@ -142,14 +143,17 @@ const ReadChapterFunctional = ({
     };
   }, [chapter._id]);
 
+  // Function to toggle Table of Contents visibility
   const toggleChapterList = () => {
     setShowTOC((prevState) => ({ showTOC: !prevState.showTOC }));
   };
 
+  // Function to close Table of Contents on mobile
   const closeTocWhenMobile = () => {
     setShowTOC((prevState) => ({ showTOC: !prevState.isMobile }));
   };
 
+  // Function to render main content
   const renderMainContent = () => {
     const { book } = chapterInsideState;
 
@@ -169,10 +173,7 @@ const ReadChapterFunctional = ({
         {!chapterInsideState.isPurchased && !chapterInsideState.isFree ? (
           <BuyButton user={user} book={book} redirectToCheckout={redirectToCheckout} />
         ) : null}
-        <div
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: htmlContent }}
-        />
+        <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
         {!chapterInsideState.isPurchased && !chapterInsideState.isFree ? (
           <BuyButton user={user} book={book} redirectToCheckout={redirectToCheckout} />
         ) : null}
@@ -180,6 +181,7 @@ const ReadChapterFunctional = ({
     );
   };
 
+  // Function to render sections
   const renderSections = () => {
     const { sections } = chapterInsideState;
 
@@ -206,6 +208,7 @@ const ReadChapterFunctional = ({
     );
   };
 
+  // Function to render sidebar
   const renderSidebar = () => {
     if (!showTOC) {
       return null;
@@ -364,34 +367,6 @@ ReadChapterFunctional.getInitialProps = async (ctx) => {
     chapter, redirectToCheckout, checkoutCanceled: !!checkout_canceled, error,
   };
 };
-
-// export async function getServerSideProps(context) {
-//   const { bookSlug, chapterSlug, buy, checkout_canceled, error } = context.query;
-//   const { req } = context;
-
-//   const headers = {};
-//   if (req && req.headers && req.headers.cookie) {
-//     headers.cookie = req.headers.cookie;
-//   }
-
-//   try {
-//     const chapter = await getChapterDetailApiMethod({ bookSlug, chapterSlug }, { headers });
-//     const redirectToCheckout = !!buy;
-
-//     return {
-//       props: {
-//         chapter,
-//         redirectToCheckout,
-//         checkoutCanceled: !!checkout_canceled,
-//         error: !error ? null : error,
-//       },
-//     };
-//   } catch (err) {
-//     return { props: {} };
-//   }
-// }
-
-// see our explanation for not using getServerSideProps at this time: https://github.com/async-labs/builderbook/issues/514
 
 export default withAuth(withRouter(ReadChapterFunctional), {
   loginRequired: false,
