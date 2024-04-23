@@ -1,63 +1,36 @@
 /* eslint-disable linebreak-style */
+
+// Configuration for ESLint
 module.exports = {
+  // Use Babel parser for parsing JavaScript files
   parser: '@babel/eslint-parser',
   parserOptions: {
+    // Do not require a Babel configuration file
     requireConfigFile: false,
+    // Specify options for Babel parser
     babelOptions: {
       parserOpts: {
+        // Enable parsing JSX syntax
         plugins: ['jsx'],
       },
     },
   },
+  // Extend the airbnb ESLint configuration
   extends: ['airbnb'],
+  // Specify environments for ESLint
   env: {
+    // Enable browser environment
     browser: true,
+    // Enable Jest environment
     jest: true,
   },
+  // Specify ESLint plugins
   plugins: ['react', 'jsx-a11y', 'import'],
+  // Specify ESLint rules
   rules: {
+    // Turn off camelcase rule
     camelcase: 'off',
+    // Allow underscore dangle for _id
     'no-underscore-dangle': ['error', { allow: ['_id'] }],
-    'no-mixed-operators': 'off',
-    'prefer-arrow-callback': 'error',
-    'prefer-destructuring': [
-      'error',
-      {
-        VariableDeclarator: {
-          array: false,
-          object: true,
-        },
-        AssignmentExpression: {
-          array: true,
-          object: false,
-        },
-      },
-      {
-        enforceForRenamedProperties: false,
-      },
-    ],
-    'import/prefer-default-export': 'off',
-    'jsx-a11y/anchor-is-valid': 'off',
-    'react/jsx-wrap-multilines': 'off',
-    'react/destructuring-assignment': 'off',
-    'react/no-danger': 'off',
-    'react/jsx-one-expression-per-line': 'off',
-    'react/jsx-props-no-spreading': 'off',
-    'react/react-in-jsx-scope': 'off',
-    'react/jsx-filename-extension': [
-      'error',
-      {
-        extensions: ['.jsx'],
-      },
-    ],
-    'no-console': 'off',
-    'class-methods-use-this': 'off',
-    'react/function-component-definition': [
-      2,
-      {
-        namedComponents: 'arrow-function',
-        unnamedComponents: 'arrow-function',
-      },
-    ],
-  },
-};
+    // Turn off no-mixed-operators rule
+    'no-mixed-operators': 'off'
