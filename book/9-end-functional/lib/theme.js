@@ -3,20 +3,21 @@
 
 import { createTheme } from '@mui/material/styles';
 
+// Define a custom MUI theme
 const theme = createTheme({
   palette: {
-    primary: { main: '#238636' },
-    secondary: { main: '#b62324' },
-    mode: 'light',
-    background: { default: '#fff' },
+    primary: { main: '#238636' }, // Define primary color
+    secondary: { main: '#b62324' }, // Define secondary color
+    mode: 'light', // Light mode
+    background: { default: '#fff' }, // Default background color
     text: {
-      primary: '#222',
+      primary: '#222', // Primary text color
     },
   },
   typography: {
-    fontFamily: ['IBM Plex Mono', 'monospace'].join(','),
+    fontFamily: ['IBM Plex Mono', 'monospace'].join(','), // Define font family
     button: {
-      textTransform: 'none',
+      textTransform: 'none', // Disable text transformation for buttons
     },
   },
 });
