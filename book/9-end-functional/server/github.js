@@ -1,5 +1,3 @@
-
-
 const { Octokit } = require('@octokit/rest');
 const fetch = require('node-fetch');
 const { oauthAuthorizationUrl } = require('@octokit/oauth-authorization-url');
@@ -10,11 +8,14 @@ const User = require('./models/User');
 
 require('dotenv').config();
 
+// Determine environment variables for GitHub client ID and secret key
 const dev = process.env.NODE_ENV !== 'production';
 const CLIENT_ID = dev ? process.env.GITHUB_TEST_CLIENTID : process.env.GITHUB_LIVE_CLIENTID;
 const API_KEY = dev ? process.env.GITHUB_TEST_SECRETKEY : process.env.GITHUB_LIVE_SECRETKEY;
 
+// Function to set up GitHub authentication routes
 function setupGithub({ server, ROOT_URL }) {
+  // Function to verify user's GitHub credentials
   const verify = async ({ user, accessToken, profile }) => {
     const modifier = {
       githubId: profile.id,
@@ -34,6 +35,7 @@ function setupGithub({ server, ROOT_URL }) {
     await User.updateOne({ _id: user._id }, modifier);
   };
 
+  // Route to initiate GitHub authentication
   server.get('/auth/github', (req, res) => {
     if (!req.user || !req.user.isAdmin) {
       res.redirect(`${ROOT_URL}/login`);
@@ -57,6 +59,7 @@ function setupGithub({ server, ROOT_URL }) {
     res.redirect(url);
   });
 
+  // Route for GitHub authentication callback
   server.get('/auth/github/callback', async (req, res) => {
     if (!req.user) {
       res.redirect(ROOT_URL);
@@ -112,6 +115,7 @@ function setupGithub({ server, ROOT_URL }) {
   });
 }
 
+// Function to get Octokit API instance with user's GitHub access token
 function getAPI({ user, previews = [], request }) {
   const github = new Octokit({
     auth: user.githubAccessToken,
@@ -131,8 +135,7 @@ function getAPI({ user, previews = [], request }) {
   return github;
 }
 
-// https://octokit.github.io/rest.js/v18#repos
-
+// Function to get repositories for authenticated user
 function getRepos({ user, request }) {
   const github = getAPI({ user, request });
 
@@ -143,6 +146,7 @@ function getRepos({ user, request }) {
   });
 }
 
+// Function to get details of a repository
 function getRepoDetail({ user, repoName, request, path }) {
   const github = getAPI({ user, request });
   const [owner, repo] = repoName.split('/');
@@ -150,6 +154,7 @@ function getRepoDetail({ user, repoName, request, path }) {
   return github.repos.getContent({ owner, repo, path });
 }
 
+// Function to get commits of a repository
 function getCommits({ user, repoName, request }) {
   const github = getAPI({ user, request });
   const [owner, repo] = repoName.split('/');
@@ -157,6 +162,7 @@ function getCommits({ user, repoName, request }) {
   return github.repos.listCommits({ owner, repo });
 }
 
+// Exporting functions for setup and interacting with GitHub
 exports.setupGithub = setupGithub;
 exports.getRepos = getRepos;
 exports.getRepoDetail = getRepoDetail;
