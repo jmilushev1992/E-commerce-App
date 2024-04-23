@@ -18,11 +18,13 @@ import { theme } from '../lib/theme';
 import Notifier from '../components/Notifier';
 import Header from '../components/Header';
 
+// Progress bar for page loading
 Router.events.on('routeChangeStart', () => {
   NProgress.start();
 });
 
 Router.events.on('routeChangeComplete', (url) => {
+  // Google Analytics integration
   if (window && process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID) {
     window.gtag('config', process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID, {
       page_path: url,
@@ -34,11 +36,13 @@ Router.events.on('routeChangeComplete', (url) => {
 
 Router.events.on('routeChangeError', () => NProgress.done());
 
+// Prop types for MyApp component
 const propTypes = {
   Component: PropTypes.elementType.isRequired,
-  pageProps: PropTypes.object.isRequired, // eslint-disable-line
+  pageProps: PropTypes.object.isRequired,
 };
 
+// Main app component
 const MyApp = ({ Component, pageProps }) => {
   const isServer = typeof window === 'undefined';
 
@@ -50,7 +54,7 @@ const MyApp = ({ Component, pageProps }) => {
     >
       <ThemeProvider theme={theme}>
         {/* ThemeProvider makes the theme available down the React tree thanks to React context. */}
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+        {/* CssBaseline kickstarts an elegant, consistent, and simple baseline to build upon. */}
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="stylesheet" href={isServer ? '/fonts/server.css' : '/fonts/cdn.css'} />
@@ -60,6 +64,7 @@ const MyApp = ({ Component, pageProps }) => {
           />
         </Head>
         <CssBaseline />
+        {/* Display header if pageProps.chapter exists */}
         {pageProps.chapter ? null : <Header {...pageProps} />}
         <Component {...pageProps} />
         <Notifier />
