@@ -9,6 +9,9 @@ import Head from 'next/head';
 import { getMyBookListApiMethod } from '../../lib/api/customer';
 import withAuth from '../../lib/withAuth';
 
+/**
+ * PropTypes for the MyBooks component.
+ */
 const propTypes = {
   purchasedBooks: PropTypes.arrayOf(
     PropTypes.shape({
@@ -17,10 +20,18 @@ const propTypes = {
   ),
 };
 
+/**
+ * Default props for the MyBooks component.
+ */
 const defaultProps = {
   purchasedBooks: [],
 };
 
+/**
+ * Component for displaying the list of purchased books.
+ * @param {Object} props - Component props.
+ * @returns {JSX.Element} - MyBooks component.
+ */
 const MyBooks = ({ purchasedBooks }) => {
   return (
     <div>
@@ -32,18 +43,16 @@ const MyBooks = ({ purchasedBooks }) => {
           <div>
             <h3>Your books</h3>
             <ul>
-              {purchasedBooks &&
-                purchasedBooks.length > 0 &&
-                purchasedBooks.map((book) => (
-                  <li key={book._id}>
-                    <Link
-                      as={`/books/${book.slug}/introduction`}
-                      href={`/public/read-chapter?bookSlug=${book.slug}&chapterSlug=introduction`}
-                    >
-                      {book.name}
-                    </Link>
-                  </li>
-                ))}
+              {purchasedBooks.map((book) => (
+                <li key={book._id}>
+                  <Link
+                    as={`/books/${book.slug}/introduction`}
+                    href={`/public/read-chapter?bookSlug=${book.slug}&chapterSlug=introduction`}
+                  >
+                    {book.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         ) : (
@@ -57,6 +66,14 @@ const MyBooks = ({ purchasedBooks }) => {
   );
 };
 
+MyBooks.propTypes = propTypes;
+MyBooks.defaultProps = defaultProps;
+
+/**
+ * Fetches the list of purchased books for the user.
+ * @param {Object} context - Context object containing request and response objects.
+ * @returns {Object} - Object containing the list of purchased books.
+ */
 MyBooks.getInitialProps = async ({ req, res }) => {
   if (req && !req.user) {
     res.redirect('/login');
@@ -73,7 +90,5 @@ MyBooks.getInitialProps = async ({ req, res }) => {
   return { purchasedBooks };
 };
 
-MyBooks.propTypes = propTypes;
-MyBooks.defaultProps = defaultProps;
-
+// Wrap MyBooks component with authentication requirement
 export default withAuth(MyBooks);
