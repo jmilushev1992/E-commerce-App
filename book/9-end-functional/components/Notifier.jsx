@@ -4,8 +4,10 @@
 import React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 
+// Function to hold the reference of the openSnackbar function
 let openSnackbarFn;
 
+// Class component for rendering a snackbar notifier
 class Notifier extends React.Component {
   constructor(props) {
     super(props);
@@ -16,10 +18,12 @@ class Notifier extends React.Component {
     };
   }
 
+  // Set the openSnackbar function reference when component mounts
   componentDidMount() {
     openSnackbarFn = this.openSnackbar;
   }
 
+  // Handle closing the snackbar
   handleSnackbarRequestClose = () => {
     this.setState({
       open: false,
@@ -27,11 +31,13 @@ class Notifier extends React.Component {
     });
   };
 
+  // Function to open the snackbar
   openSnackbar = ({ message }) => {
     this.setState({ open: true, message });
   };
 
   render() {
+    // Render the message as HTML
     const message = (
       <span id="snackbar-message-id" dangerouslySetInnerHTML={{ __html: this.state.message }} />
     );
@@ -51,6 +57,7 @@ class Notifier extends React.Component {
   }
 }
 
+// Exported function to open the snackbar
 export function openSnackbarExported({ message }) {
   openSnackbarFn({ message });
 }
