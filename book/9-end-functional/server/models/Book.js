@@ -1,21 +1,22 @@
 /* eslint-disable linebreak-style */
 
+// Disable eslint rule for using variables before they are defined
 /* eslint-disable no-use-before-define */
 
 const mongoose = require('mongoose');
 const frontmatter = require('front-matter');
 
+// Import utility functions and models
 const generateSlug = require('../utils/slugify');
 const User = require('./User');
 const Purchase = require('./Purchase');
-
 const { getCommits, getRepoDetail } = require('../github');
 const { addToMailchimp } = require('../mailchimp');
-
 const logger = require('../logger');
+const Chapter = require('./Chapter');
 
+// Define mongoose schema
 const { Schema } = mongoose;
-
 const mongoSchema = new Schema({
   name: {
     type: String,
@@ -31,7 +32,6 @@ const mongoSchema = new Schema({
     required: true,
   },
   githubLastCommitSha: String,
-
   createdAt: {
     type: Date,
     required: true,
@@ -42,6 +42,7 @@ const mongoSchema = new Schema({
   },
 });
 
+// Define class methods for Book model
 class BookClass {
   static async list({ offset = 0, limit = 10 } = {}) {
     const books = await this.find({}).sort({ createdAt: -1 }).skip(offset).limit(limit);
@@ -49,21 +50,21 @@ class BookClass {
   }
 
   static async getBySlug({ slug }) {
+    // Retrieve book by slug and populate chapters
     const bookDoc = await this.findOne({ slug });
     if (!bookDoc) {
       throw new Error('Book not found');
     }
 
     const book = bookDoc.toObject();
-
-    book.chapters = (await Chapter.find({ bookId: book._id }, 'title slug').sort({ order: 1 })).map(
-      (chapter) => chapter.toObject(),
-    );
+    book.chapters = (await Chapter.find({ bookId: book._id }, 'title slug').sort({ order: 1 }))
+      .map((chapter) => chapter.toObject());
 
     return book;
   }
 
   static async add({ name, price, githubRepo }) {
+    // Add a new book with a unique slug
     const slug = await generateSlug(this, name);
     if (!slug) {
       throw new Error(`Error with slug generation for name: ${name}`);
@@ -78,8 +79,8 @@ class BookClass {
   }
 
   static async edit({ id, name, price, githubRepo }) {
+    // Edit an existing book
     const book = await this.findById(id, 'slug name');
-
     if (!book) {
       throw new Error('Book is not found by id');
     }
@@ -101,8 +102,8 @@ class BookClass {
   }
 
   static async syncContent({ id, user, request }) {
+    // Sync content of book from GitHub repository
     const book = await this.findById(id, 'githubRepo githubLastCommitSha');
-
     if (!book) {
       throw new Error('Book not found');
     }
@@ -129,40 +130,38 @@ class BookClass {
       path: '',
     });
 
-    await Promise.all(
-      mainFolder.data.map(async (f) => {
-        if (f.type !== 'file') {
-          return;
-        }
+    await Promise.all(mainFolder.data.map(async (f) => {
+      if (f.type !== 'file') {
+        return;
+      }
 
-        if (f.path !== 'introduction.md' && !/chapter-([0-9]+)\.md/.test(f.path)) {
-          return;
-        }
+      if (f.path !== 'introduction.md' && !/chapter-([0-9]+)\.md/.test(f.path)) {
+        return;
+      }
 
-        const chapter = await getRepoDetail({
-          user,
-          repoName: book.githubRepo,
-          request,
-          path: f.path,
-        });
+      const chapter = await getRepoDetail({
+        user,
+        repoName: book.githubRepo,
+        request,
+        path: f.path,
+      });
 
-        const data = frontmatter(Buffer.from(chapter.data.content, 'base64').toString('utf8'));
+      const data = frontmatter(Buffer.from(chapter.data.content, 'base64').toString('utf8'));
+      data.path = f.path;
 
-        data.path = f.path;
-
-        try {
-          await Chapter.syncContent({ book, data });
-          logger.info('Content is synced', { path: f.path });
-        } catch (error) {
-          logger.error('Content sync has error', { path: f.path, error });
-        }
-      }),
-    );
+      try {
+        await Chapter.syncContent({ book, data });
+        logger.info('Content is synced', { path: f.path });
+      } catch (error) {
+        logger.error('Content sync has error', { path: f.path, error });
+      }
+    }));
 
     return book.updateOne({ githubLastCommitSha: lastCommitSha });
   }
 
   static async buy({ book, user, stripeCharge }) {
+    // Purchase a book
     if (!book) {
       throw new Error('Book not found');
     }
@@ -195,17 +194,19 @@ class BookClass {
   }
 
   static async getPurchasedBooks({ purchasedBookIds }) {
-    const purchasedBooks = await this.find({ _id: { $in: purchasedBookIds } }).sort({
-      createdAt: -1,
-    });
+    // Get purchased books based on their IDs
+    const purchasedBooks = await this.find({ _id: { $in: purchasedBookIds } }).sort({ createdAt: -1 });
     return purchasedBooks;
   }
 }
 
+// Load BookClass as a schema class
 mongoSchema.loadClass(BookClass);
 
+// Create Book model
 const Book = mongoose.model('Book', mongoSchema);
 
 module.exports = Book;
 
+// Require Chapter model
 const Chapter = require('./Chapter');
