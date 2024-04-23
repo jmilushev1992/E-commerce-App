@@ -1,5 +1,6 @@
-/* eslint-disable linebreak-style */
-// eslint-disable-next-line no-multiple-empty-lines
+/* eslint-disable linebreak-style */ // Disabling linebreak style linting rule
+
+// eslint-disable-next-line no-multiple-empty-lines // Disabling linting rule for multiple empty lines
 
 import Head from 'next/head';
 import { withRouter } from 'next/router';
@@ -17,6 +18,7 @@ const propTypes = {
 };
 
 const Login = ({ router }) => {
+  // Extracting redirect URL from router query or setting it to an empty string
   const redirectUrl = (router && router.query && router.query.redirectUrl) || '';
 
   return (
@@ -29,6 +31,7 @@ const Login = ({ router }) => {
       <p style={{ margin: '45px auto', fontSize: '44px', fontWeight: '400' }}>Log in</p>
       <p>You’ll be logged in for 14 days unless you log out manually.</p>
       <br />
+      {/* Log in button with Google */}
       <Button
         variant="contained"
         color="secondary"
@@ -45,6 +48,7 @@ const Login = ({ router }) => {
   );
 };
 
-Login.propTypes = propTypes;
+Login.propTypes = propTypes; // Prop type validation
 
+// Exporting Login component with authentication and withRouter higher order components
 export default withAuth(withRouter(Login), { logoutRequired: true });
