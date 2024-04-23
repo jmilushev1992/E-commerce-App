@@ -10,26 +10,38 @@ import EditBook from '../../components/admin/EditBook';
 import { addBookApiMethod, syncBookContentApiMethod } from '../../lib/api/admin';
 import notify from '../../lib/notify';
 
+/**
+ * Page component for adding a new book.
+ * @returns {JSX.Element} - AddBook component.
+ */
 const AddBook = () => {
+  /**
+   * Function to handle saving a new book.
+   * @param {Object} data - Book data to be saved.
+   */
   const addBookOnSave = async (data) => {
-    NProgress.start();
+    NProgress.start(); // Start progress bar
 
     try {
+      // Add new book
       const book = await addBookApiMethod(data);
       notify('Saved');
+
       try {
         const bookId = book._id;
+        // Sync book content
         await syncBookContentApiMethod({ bookId });
         notify('Synced');
-        NProgress.done();
+        NProgress.done(); // Complete progress bar
+        // Redirect to book detail page
         Router.push(`/admin/book-detail?slug=${book.slug}`, `/admin/book-detail/${book.slug}`);
       } catch (err) {
         notify(err.message || err.toString());
-        NProgress.done();
+        NProgress.done(); // Complete progress bar
       }
     } catch (err) {
       notify(err.message || err.toString());
-      NProgress.done();
+      NProgress.done(); // Complete progress bar
     }
   };
 
@@ -40,4 +52,5 @@ const AddBook = () => {
   );
 };
 
+// Wrap AddBook component with authentication requirement (admin)
 export default withAuth(AddBook, { adminRequired: true });
