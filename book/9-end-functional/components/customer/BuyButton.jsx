@@ -11,20 +11,24 @@ import { fetchCheckoutSessionApiMethod } from '../../lib/api/customer';
 
 import notify from '../../lib/notify';
 
+// Style for the buy button
 const styleBuyButton = {
   margin: '10px 20px 0px 0px',
 };
 
+// Determine the environment and set the root URL accordingly
 const dev = process.env.NODE_ENV !== 'production';
 const port = process.env.NEXT_PUBLIC_PORT || 8000;
 const ROOT_URL = `http://localhost:${port}`;
 
+// Load Stripe
 const stripePromise = loadStripe(
   dev
     ? process.env.NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLEKEY
     : process.env.NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLEKEY,
 );
 
+// Prop types definition
 const propTypes = {
   book: PropTypes.shape({
     _id: PropTypes.string.isRequired,
@@ -40,6 +44,7 @@ const propTypes = {
   redirectToCheckout: PropTypes.bool,
 };
 
+// Default props
 const defaultProps = {
   book: null,
   user: null,
@@ -48,11 +53,13 @@ const defaultProps = {
 
 class BuyButton extends React.Component {
   componentDidMount() {
+    // If redirectToCheckout prop is true, initiate checkout process on mount
     if (this.props.redirectToCheckout) {
       this.handleCheckoutClick();
     }
   }
 
+  // Redirect to login page when the user is not logged in
   onLoginClicked = () => {
     const { user } = this.props;
 
@@ -62,6 +69,7 @@ class BuyButton extends React.Component {
     }
   };
 
+  // Handle the click event for checkout
   handleCheckoutClick = async () => {
     NProgress.start();
 
@@ -89,10 +97,12 @@ class BuyButton extends React.Component {
   render() {
     const { book, user } = this.props;
 
+    // If book is not available, return null
     if (!book) {
       return null;
     }
 
+    // If user is not logged in, display login button
     if (!user) {
       return (
         <div>
@@ -109,6 +119,7 @@ class BuyButton extends React.Component {
         </div>
       );
     }
+    // If user is logged in, display buy button
     return (
       <div>
         <Button
